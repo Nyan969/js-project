@@ -1,14 +1,15 @@
-import {API} from '../../settings.js';
-import {popup} from "../popup/popup";
-import {checkLinkValid, checkTextValid} from "../../validations";
+import {API} from './settings.js';
+import {Popup} from "./popup";
+import {checkLinkValid, checkTextValid} from "./validations";
 // Это класс для отрисовки карточек.
 export class CardList {
     constructor(container, user) {
         this.container = container;
+        this.user = user;
 
-        fetch(`${API.url}/cards`, {
+        fetch(`${API.URL}/cards`, {
             headers: {
-                authorization: API.token,
+                authorization: API.TOKEN,
                 'Content-Type': 'application/json'
             }
         })
@@ -19,7 +20,7 @@ export class CardList {
             })
             .then((result) => {
                 const cards = result.map(item => {
-                    return new Card(item['name'], item['link'], item['likes'], item['_id'], item['owner']['_id'], user);
+                    return new Card(item['name'], item['link'], item['likes'], item['_id'], item['owner']['_id'],  this.user);
                 });
                 cards.forEach(item => {
                     this.container.appendChild(item.domElement);
@@ -30,37 +31,8 @@ export class CardList {
             });
     }
 
-    sendImage(name, link, user) {
-        popup.preloader(true);
-        fetch(`${API.url}/cards`, {
-            method: 'POST',
-            headers: {
-                authorization: API.token,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                name: name,
-                link: link
-            })
-        })
-            .then((res) => {
-                if (res.ok) {
-                    return res.json()
-                }
-            })
-            .then((data) => {
-                this.addCard(new Card(data['name'], data['link'], data['likes'], data['_id'], data['owner']['_id'], user))
-            })
-            .catch((err) => {
-                console.error(err);
-            })
-            .finally(() => {
-                popup.preloader(false);
-                popup.close();
-            });
-    }
-
-    addCard(item) {
+    addCard(data) {
+        const item = new Card(data['name'], data['link'], data['likes'], data['_id'], data['owner']['_id'],  this.user);
         this.container.appendChild(item.domElement);
     }
 }
@@ -86,10 +58,10 @@ class Card {
         } else { //если лайк есть
             method = 'DELETE'
         }
-        fetch(`${API.url}/cards/like/${this.cardID}`, {
+        fetch(`${API.URL}/cards/like/${this.cardID}`, {
             method: method,
             headers: {
-                authorization: API.token,
+                authorization: API.TOKEN,
                 'Content-Type': 'application/json'
             }
         })
@@ -114,10 +86,10 @@ class Card {
             this.cardElement.querySelector('.place-card__delete-icon').removeEventListener('click', this.remove);
             this.cardElement.querySelector('.place-card__image').removeEventListener('click', this.openImage);
 
-            fetch(`${API.url}/cards/${this.cardID}`, {
+            fetch(`${API.URL}/cards/${this.cardID}`, {
                 method: 'DELETE',
                 headers: {
-                    authorization: API.token,
+                    authorization: API.TOKEN,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
@@ -170,12 +142,14 @@ class Card {
 }
 //это класс для формы карточки
 export class CardForm {
-    constructor(cardList, user) {
+    constructor(cardList) {
         const template = document.querySelector('#FormCardTemplate');
         this.templateElement = document.importNode(template.content, true);
         this.cardList = cardList;
-        this.user = user;
         this.buttonClick = this.buttonClick.bind(this);
+        this.popup = new Popup();
+        this.popup.open(this.templateElement);
+        this.connect();
     }
 
     connect() {
@@ -186,7 +160,37 @@ export class CardForm {
 
     buttonClick(event) {
         event.preventDefault();
-        this.cardList.sendImage(document.forms.new.elements.title.value, document.forms.new.elements.link.value, this.user);
+        this.sendImage(document.forms.new.elements.title.value, document.forms.new.elements.link.value);
+    }
+
+    sendImage(name, link) {
+        this.popup.preload(true);
+        fetch(`${API.URL}/cards`, {
+            method: 'POST',
+            headers: {
+                authorization: API.TOKEN,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: name,
+                link: link
+            })
+        })
+            .then((res) => {
+                if (res.ok) {
+                    return res.json()
+                }
+            })
+            .then((data) => {
+                this.cardList.addCard(data)
+            })
+            .catch((err) => {
+                console.error(err);
+            })
+            .finally(() => {
+                this.popup.preload(false);
+                this.popup.close();
+            });
     }
 }
 

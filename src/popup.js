@@ -1,5 +1,5 @@
 // Это класс для всплывающего окна
-class Popup {
+export class Popup {
     constructor() {
         this.closeClickOutsidePopup = this.closeClickOutsidePopup.bind(this);
         document.querySelector('.popup__close').addEventListener('click', this.close);
@@ -21,7 +21,7 @@ class Popup {
             }
 
             document.querySelector('.popup__close').removeEventListener('click', this.close);
-            document.querySelector('.popup_is-opened').removeEventListener('mousedown', popup.closeClickOutsidePopup);
+            document.querySelector('.popup_is-opened').removeEventListener('mousedown', this.closeClickOutsidePopup);
 
             document.querySelector('.popup').classList.remove('popup_is-opened');
             const container = document.querySelector('.templateContainer');
@@ -37,7 +37,7 @@ class Popup {
         }
     }
 
-    preloader(loading) {
+    preload(loading) {
         this.loading = loading;
         const button = document.querySelector('.popup__button');
         if (this.loading) {
@@ -48,4 +48,3 @@ class Popup {
         }
     }
 }
-export const popup = new Popup();

@@ -1,8 +1,8 @@
 import "./style.css";
-import {EditForm, AvatarForm, User} from "./blocks/profile/user";
-import {CardList, CardForm} from "./blocks/places-list/cardList";
-import {popup} from "./blocks/popup/popup";
-
+import {User} from "./user";
+import {CardList, CardForm} from "./cardList";
+import {EditForm} from "./editForm";
+import {AvatarForm} from "./avatarForm";
 /*************************************************************************************/
 const user = new User();
 const cardList = new CardList(document.querySelector('.places-list'), user);
@@ -12,9 +12,7 @@ const cardList = new CardList(document.querySelector('.places-list'), user);
  */
 const openButton = document.querySelector('.user-info__button');
 openButton.addEventListener('click', function () {
-    const cardForm = new CardForm(cardList, user);
-    popup.open(cardForm.templateElement);
-    cardForm.connect();
+    new CardForm(cardList);
 });
 /**
  * Кнопка открытия формы редактирования о себе
