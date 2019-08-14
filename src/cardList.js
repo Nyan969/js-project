@@ -1,6 +1,7 @@
 import {API} from './settings.js';
 import {Popup} from "./popup";
 import {checkLinkValid, checkTextValid} from "./validations";
+
 // Это класс для отрисовки карточек.
 export class CardList {
     constructor(container, user) {
@@ -20,7 +21,7 @@ export class CardList {
             })
             .then((result) => {
                 const cards = result.map(item => {
-                    return new Card(item['name'], item['link'], item['likes'], item['_id'], item['owner']['_id'],  this.user);
+                    return new Card(item['name'], item['link'], item['likes'], item['_id'], item['owner']['_id'], this.user);
                 });
                 cards.forEach(item => {
                     this.container.appendChild(item.domElement);
@@ -32,10 +33,11 @@ export class CardList {
     }
 
     addCard(data) {
-        const item = new Card(data['name'], data['link'], data['likes'], data['_id'], data['owner']['_id'],  this.user);
+        const item = new Card(data['name'], data['link'], data['likes'], data['_id'], data['owner']['_id'], this.user);
         this.container.appendChild(item.domElement);
     }
 }
+
 // Это класс карточки.
 class Card {
     constructor(name, link, likes, cardID, authorID, user) {
@@ -140,6 +142,7 @@ class Card {
         }
     }
 }
+
 //это класс для формы карточки
 export class CardForm {
     constructor(cardList) {
@@ -147,7 +150,7 @@ export class CardForm {
         this.templateElement = document.importNode(template.content, true);
         this.cardList = cardList;
         this.buttonClick = this.buttonClick.bind(this);
-        this.popup = new Popup();
+        this.popup = new Popup(this.close);
         this.popup.open(this.templateElement);
         this.connect();
     }
@@ -191,6 +194,12 @@ export class CardForm {
                 this.popup.preload(false);
                 this.popup.close();
             });
+    }
+
+    close() {
+        document.forms.new.removeEventListener('submit', this.buttonClick);
+        document.forms.new.elements.title.removeEventListener('input', checkTextValid);
+        document.forms.new.elements.link.removeEventListener('input', checkLinkValid);
     }
 }
 

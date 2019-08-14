@@ -1,9 +1,10 @@
 // Это класс для всплывающего окна
 export class Popup {
-    constructor() {
+    constructor(callback) {
         this.closeClickOutsidePopup = this.closeClickOutsidePopup.bind(this);
         document.querySelector('.popup__close').addEventListener('click', this.close);
         this.loading = false;
+        this.callback = callback;
     }
 
     open(templateElement) {
@@ -15,6 +16,10 @@ export class Popup {
 
     close() {
         if (!this.loading) {
+            if (typeof this.callback === "function") {
+                this.callback();
+            }
+
             if (document.querySelector('.popup__content_image')) {
                 document.querySelector('.popup__content_image').classList.add('popup__content');
                 document.querySelector('.popup__content_image').classList.remove('popup__content_image')
