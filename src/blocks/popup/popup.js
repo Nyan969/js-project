@@ -1,6 +1,7 @@
 // Это класс для всплывающего окна
 class Popup {
     constructor() {
+        this.closeClickOutsidePopup = this.closeClickOutsidePopup.bind(this);
         document.querySelector('.popup__close').addEventListener('click', this.close);
         this.loading = false;
     }
@@ -32,7 +33,7 @@ class Popup {
 
     closeClickOutsidePopup(event) {
         if (!(event.target).closest('.popup__content') && !(event.target).closest('.popup__content_image') && (!this.loading)) {
-            popup.close();
+            this.close();
         }
     }
 

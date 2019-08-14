@@ -1,10 +1,9 @@
-import {API} from './settings.js';
-import {popup} from "./popup";
-import {checkLinkValid, checkTextValid} from "./validations";
-import {user, cardList} from './index.js';
+import {API} from '../../settings.js';
+import {popup} from "../popup/popup";
+import {checkLinkValid, checkTextValid} from "../../validations";
 // Это класс для отрисовки карточек.
 export class CardList {
-    constructor(container) {
+    constructor(container, user) {
         this.container = container;
 
         fetch(`${API.url}/cards`, {
@@ -20,7 +19,7 @@ export class CardList {
             })
             .then((result) => {
                 const cards = result.map(item => {
-                    return new Card(item['name'], item['link'], item['likes'], item['_id'], item['owner']['_id']);
+                    return new Card(item['name'], item['link'], item['likes'], item['_id'], item['owner']['_id'], user);
                 });
                 cards.forEach(item => {
                     this.container.appendChild(item.domElement);
@@ -31,7 +30,7 @@ export class CardList {
             });
     }
 
-    sendImage(name, link) {
+    sendImage(name, link, user) {
         popup.preloader(true);
         fetch(`${API.url}/cards`, {
             method: 'POST',
@@ -50,7 +49,7 @@ export class CardList {
                 }
             })
             .then((data) => {
-                this.addCard(new Card(data['name'], data['link'], data['likes'], data['_id'], data['owner']['_id']))
+                this.addCard(new Card(data['name'], data['link'], data['likes'], data['_id'], data['owner']['_id'], user))
             })
             .catch((err) => {
                 console.error(err);
@@ -66,13 +65,14 @@ export class CardList {
     }
 }
 // Это класс карточки.
-export class Card {
-    constructor(name, link, likes, cardID, authorID) {
+class Card {
+    constructor(name, link, likes, cardID, authorID, user) {
         this.name = name;
         this.link = link;
         this.likes = likes;
         this.cardID = cardID;
         this.authorID = authorID;
+        this.user = user;
         this.openImage = this.openImage.bind(this);
         this.remove = this.remove.bind(this);
         this.like = this.like.bind(this);
@@ -148,11 +148,11 @@ export class Card {
         placeCardLikeCount.textContent = this.likes.length;
         this.domElement = document.importNode(cardTemplate.content, true);
         this.likes.forEach(item => {
-            if (item._id === user.userID) {
+            if (item._id === this.user.userID) {
                 this.domElement.querySelector('.place-card__like-icon').classList.add('place-card__like-icon_liked');
             }
         });
-        if (this.authorID === user.userID) {
+        if (this.authorID === this.user.userID) {
             this.domElement.querySelector('.place-card__delete-icon').addEventListener('click', this.remove);
         } else {
             this.domElement.querySelector('.place-card__delete-icon').remove();
@@ -169,10 +169,13 @@ export class Card {
     }
 }
 //это класс для формы карточки
-class CardForm {
-    constructor() {
+export class CardForm {
+    constructor(cardList, user) {
         const template = document.querySelector('#FormCardTemplate');
         this.templateElement = document.importNode(template.content, true);
+        this.cardList = cardList;
+        this.user = user;
+        this.buttonClick = this.buttonClick.bind(this);
     }
 
     connect() {
@@ -183,7 +186,7 @@ class CardForm {
 
     buttonClick(event) {
         event.preventDefault();
-        cardList.sendImage(document.forms.new.elements.title.value, document.forms.new.elements.link.value);
+        this.cardList.sendImage(document.forms.new.elements.title.value, document.forms.new.elements.link.value, this.user);
     }
 }
 
@@ -198,13 +201,3 @@ class ImageView {
         this.templateElement = document.importNode(this.template.content, true);
     }
 }
-/**
- * Кнопка открытия формы добавления карточки
- */
-const openButton = document.querySelector('.user-info__button');
-openButton.addEventListener('click', function () {
-    const cardForm = new CardForm();
-    popup.open(cardForm.templateElement);
-    cardForm.connect();
-});
-

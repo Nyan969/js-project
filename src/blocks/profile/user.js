@@ -1,17 +1,18 @@
-import {checkLinkValid, checkTextValid} from "./validations";
-import {popup} from "./popup";
-import {API} from './settings.js';
-import {user} from "./index";
+import {checkLinkValid, checkTextValid} from "../../validations";
+import {popup} from "../popup/popup";
+import {API} from '../../settings.js';
 
 //это класс для формы редактирования
-class EditForm {
-    constructor() {
+export class EditForm {
+    constructor(user) {
         this.template = document.querySelector(`#FormEditTemplate`);
         this.containerName = this.template.content.querySelector('.popup__input_type_name');
         this.containerJob = this.template.content.querySelector('.popup__input_type_job');
         this.containerName.value = document.querySelector('.user-info__name').innerText;
         this.containerJob.value = document.querySelector('.user-info__job').innerText;
         this.templateElement = document.importNode(this.template.content, true);
+        this.user = user;
+        this.buttonClick = this.buttonClick.bind(this);
     }
 
     connect() {
@@ -22,15 +23,17 @@ class EditForm {
 
     buttonClick(event) {
         event.preventDefault();
-        user.sendInfo(document.forms.edit.elements.name.value, document.forms.edit.elements.job.value);
+        this.user.sendInfo(document.forms.edit.elements.name.value, document.forms.edit.elements.job.value);
     }
 }
 
 //это класс для формы обновления аватара
-class AvatarForm {
-    constructor() {
+export class AvatarForm {
+    constructor(user) {
         const template = document.querySelector('#FormAvatarTemplate');
         this.templateElement = document.importNode(template.content, true);
+        this.user = user;
+        this.buttonClick = this.buttonClick.bind(this);
     }
 
     connect() {
@@ -40,7 +43,7 @@ class AvatarForm {
 
     buttonClick(event) {
         event.preventDefault();
-        user.updateAvatar(document.forms.avatar.elements.link.value);
+        this.user.updateAvatar(document.forms.avatar.elements.link.value);
     }
 }
 
@@ -88,7 +91,7 @@ export class User {
                 console.error(err);
             })
             .then(() => {
-                user.updateInfo(name, job);
+                this.updateInfo(name, job);
             })
             .finally(() => {
                 popup.preloader(false);
@@ -133,22 +136,4 @@ export class User {
             });
     }
 }
-/**
- * Кнопка открытия формы редактирования о себе
- * */
-const editButton = document.querySelector('.button_edit');
-editButton.addEventListener('click', function () {
-    const editForm = new EditForm();
-    popup.open(editForm.templateElement);
-    editForm.connect();
-});
 
-/**
- * Кнопка для обновления аватара
- */
-const updateAvatarButton = document.querySelector('.user-info__photo');
-updateAvatarButton.addEventListener('click', function () {
-    const avatarForm = new AvatarForm();
-    popup.open(avatarForm.templateElement);
-    avatarForm.connect()
-});
