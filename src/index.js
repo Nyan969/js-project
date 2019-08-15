@@ -1,8 +1,9 @@
 import "./style.css";
 import {User} from "./user";
-import {CardList, CardForm} from "./cardList";
+import {CardList} from "./cardList";
 import {EditForm} from "./editForm";
 import {AvatarForm} from "./avatarForm";
+import {CardForm} from "./cardForm";
 /*************************************************************************************/
 const user = new User();
 const cardList = new CardList(document.querySelector('.places-list'), user);
@@ -19,9 +20,7 @@ openButton.addEventListener('click', function () {
  * */
 const editButton = document.querySelector('.button_edit');
 editButton.addEventListener('click', function () {
-    const editForm = new EditForm(user);
-    popup.open(editForm.templateElement);
-    editForm.connect();
+    new EditForm(user);
 });
 
 /**
@@ -29,7 +28,5 @@ editButton.addEventListener('click', function () {
  */
 const updateAvatarButton = document.querySelector('.user-info__photo');
 updateAvatarButton.addEventListener('click', function () {
-    const avatarForm = new AvatarForm(user);
-    popup.open(avatarForm.templateElement);
-    avatarForm.connect()
+    new AvatarForm(user);
 });
