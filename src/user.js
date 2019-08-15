@@ -26,7 +26,7 @@ export class User {
         document.querySelector('.user-info__name').textContent = name;
         document.querySelector('.user-info__job').textContent = job;
         if (avatar) {
-            document.querySelector('.user-info__photo').style.backgroundImage = `url(${avatar})`;
+            this.updateAvatar(avatar);
         }
     }
 

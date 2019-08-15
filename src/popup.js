@@ -2,6 +2,7 @@
 export class Popup {
     constructor(callback) {
         this.closeClickOutsidePopup = this.closeClickOutsidePopup.bind(this);
+        this.close = this.close.bind(this);
         document.querySelector('.popup__close').addEventListener('click', this.close);
         this.loading = false;
         this.callback = callback;

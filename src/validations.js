@@ -1,32 +1,3 @@
-//Проверка валидности у поля с ссылкой.
-export function checkLinkValid(event) {
-    const name = event.target.name;
-    const value = event.target.value;
-
-    if (value === '' || value.match(/(https|http)(.+?)\.(jpeg|jpg|png)$/) === null) {
-        const message = value === '' ? 'Это обязательное поле' : 'Здесь должна быть ссылка';
-
-        createErrorElement(event.target, `place-card__error_${name}`, message);
-    } else {
-        const classErrors = [`.place-card__error_${name}`];
-        removeErrorElement(classErrors);
-    }
-
-    checkDisabled(event.target.form);
-}
-//Проверка валидности у текстовых полей.
-export function checkTextValid(event) {
-    const name = event.target.name;
-    const value = event.target.value;
-    if (value === '' || value.length < 2 || value.length > 30) {
-        const message = value === '' ? 'Это обязательное поле' : 'Должно быть от 2 до 30 символов';
-        createErrorElement(event.target, `place-card__error_${name}`, message);
-    } else {
-        const classErrors = [`.place-card__error_${name}`];
-        removeErrorElement(classErrors);
-    }
-    checkDisabled(event.target.form);
-}
 /**
  * проверяет нужен ли disabled
  */
@@ -44,6 +15,7 @@ function checkDisabled(form) {
         setDisabled(true, form.elements.button);
     }
 }
+
 /**
  * устанавливает/убирает disabled
  */
@@ -80,3 +52,32 @@ function removeErrorElement(classErrors) {
         }
     })
 }
+//Проверка валидности у поля с ссылкой.
+export const checkLinkValid = function (event) {
+    const name = event.target.name;
+    const value = event.target.value;
+
+    if (value === '' || value.match(/(https|http)(.+?)\.(jpeg|jpg|png)$/) === null) {
+        const message = value === '' ? 'Это обязательное поле' : 'Здесь должна быть ссылка';
+
+        createErrorElement(event.target, `place-card__error_${name}`, message);
+    } else {
+        const classErrors = [`.place-card__error_${name}`];
+        removeErrorElement(classErrors);
+    }
+
+    checkDisabled(event.target.form);
+};
+//Проверка валидности у текстовых полей.
+export const checkTextValid = function(event) {
+    const name = event.target.name;
+    const value = event.target.value;
+    if (value === '' || value.length < 2 || value.length > 30) {
+        const message = value === '' ? 'Это обязательное поле' : 'Должно быть от 2 до 30 символов';
+        createErrorElement(event.target, `place-card__error_${name}`, message);
+    } else {
+        const classErrors = [`.place-card__error_${name}`];
+        removeErrorElement(classErrors);
+    }
+    checkDisabled(event.target.form);
+};
